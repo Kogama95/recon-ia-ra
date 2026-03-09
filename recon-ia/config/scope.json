@@ -1,0 +1,7 @@
+{
+  "lab_mode": true,
+  "authorized_networks": ["172.21.0.0/24", "172.20.0.0/24"],
+  "authorized_domains":  [anip.bj],
+  "allowed_ports":       "21,22,80,443,3306,5432,8080",
+  "max_scan_rate":       50
+}

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Report Pro - Analyse d'entreprise avancée</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #1abc9c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: var(--accent);
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: var(--transition);
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="100%" height="100%" fill="%232c3e50" opacity="0.03"/><path d="M0,100 Q50,50 100,100 T200,100 L200,0 L0,0 Z" fill="%233498db" opacity="0.05"/></svg>') no-repeat center center;
+            background-size: cover;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+        
+        /* Report Generator */
+        .report-generator {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            margin: -80px auto 50px;
+            position: relative;
+            max-width: 800px;
+        }
+        
+        .generator-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .generator-header h3 {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .generator-header p {
+            color: #7f8c8d;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+        
+        .input-wrapper input {
+            width: 100%;
+            padding: 18px 20px 18px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .generate-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        
+        .generate-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .generate-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card i {
+            font-size: 48px;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h4 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 60px 0 30px;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h4 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent);
+        }
+        
+        .footer-section p, .footer-section a {
+            color: #bdc3c7;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-section a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: var(--transition);
+        }
+        
+        .social-icons a:hover {
+            background: var(--accent);
+            transform: translateY(-5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bdc3c7;
+            font-size: 14px;
+        }
+        
+        
+        /* ══ Module Reconnaissance Active — KOHOUNKO 2024-2025 ══ */
+        #section-active { background:white; border-radius:15px; box-shadow:var(--shadow); padding:40px; margin:0 auto 50px; max-width:800px; }
+        #section-active .generator-header h3 { color:#1a5276; }
+        .active-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:18px; background:linear-gradient(90deg,#1a5276,#2e86c1); color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; transition:var(--transition); margin-top:10px; }
+        .active-btn:hover { background:linear-gradient(90deg,#154360,#1a5276); transform:translateY(-2px); }
+        .active-btn:disabled { background:#bdc3c7; cursor:not-allowed; transform:none; }
+        .badge-active { display:inline-block; background:rgba(231,76,60,.12); color:#c0392b; border:1px solid #c0392b; border-radius:4px; font-size:11px; font-weight:700; padding:2px 8px; letter-spacing:1px; margin-left:8px; vertical-align:middle; }
+        .auth-box { display:none; padding:12px 16px; border-radius:8px; margin-top:10px; font-size:14px; font-weight:500; }
+        .auth-ok  { background:rgba(39,174,96,.1);  color:#1e8449; border:1px solid #1e8449; }
+        .auth-ko  { background:rgba(231,76,60,.1);  color:#922b21; border:1px solid #922b21; }
+        .scan-box { display:none; margin-top:24px; border:1px solid #d5d8dc; border-radius:10px; overflow:hidden; }
+        .scan-head { background:#1a5276; color:white; padding:12px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+        .risk-pill { padding:3px 14px; border-radius:20px; font-size:12px; font-weight:700; }
+        .risk-FAIBLE{background:#d5f5e3;color:#1e8449;} .risk-MODÉRÉ{background:#fef9e7;color:#b7950b;}
+        .risk-ÉLEVÉ{background:#fdebd0;color:#a04000;} .risk-CRITIQUE{background:#fadbd8;color:#922b21;}
+        .scan-body { padding:20px; }
+        .res-block { margin-bottom:16px; }
+        .res-block h5 { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#7f8c8d; margin-bottom:8px; }
+        .tags { display:flex; flex-wrap:wrap; gap:6px; }
+        .tag  { background:#eaf2ff; color:#1a5276; border:1px solid #aed6f1; border-radius:4px; padding:3px 10px; font-size:12px; font-family:monospace; }
+        .tag.warn { background:#fef9e7; color:#b7950b; border-color:#f9e79f; }
+        .row-item { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid #f2f3f4; font-size:13px; color:#34495e; }
+        .row-item:last-child { border-bottom:none; }
+        .audit-info { font-size:12px; color:#95a5a6; margin-top:8px; }
+        /* ══ fin module actif ══════════════════════════════════════ */
+/* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(52, 152, 219, 0.2);
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Result Section */
+        .result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: rgba(39, 174, 96, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .result i {
+            font-size: 48px;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+        
+        .error {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .error i {
+            font-size: 48px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+        
+        /* Notification Popup */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 350px;
+            display: flex;
+            align-items: center;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: #d4edda;
+            border-left: 5px solid var(--success);
+            color: #155724;
+        }
+        
+        .notification.error {
+            background-color: #f8d7da;
+            border-left: 5px solid var(--danger);
+            color: #721c24;
+        }
+        
+        .notification-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: inherit;
+            margin-left: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            .hero {
+                padding: 60px 0;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .report-generator {
+                padding: 25px;
+                margin: -50px auto 30px;
+            }
+            
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+                transform: translateY(-150%);
+            }
+            
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+        
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(52, 152, 219, 0.1);
+            text-align: center;
+            display: none;
+        }
+        
+        .email-sent {
+            background: rgba(39, 174, 96, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Popup -->
+    <div class="notification" id="notification">
+        <i class="notification-icon" id="notification-icon"></i>
+        <div class="notification-content">
+            <div class="notification-title" id="notification-title"></div>
+            <div id="notification-message"></div>
+        </div>
+        <button class="notification-close" id="notification-close">&times;</button>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>OSINT <span>Report Pro</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="return false"><i class="fas fa-home"></i> Accueil</a></li>
+                    <li><a href="#section-active" id="nav-active"><i class="fas fa-crosshairs"></i> Reconnaissance Active</a></li>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> À propos</a></li>
+                    <li><a href="#"><i class="fas fa-cogs"></i> Fonctionnalités</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h2>Analyse d'Entreprise Avancée</h2>
+            <p>Obtenez des rapports complets de reconnaissance passive en quelques secondes</p>
+        </div>
+    </section>
+
+    <!-- Report Generator -->
+    <div class="container">
+        <div class="report-generator">
+            <div class="generator-header">
+                <h3>Générez votre rapport</h3>
+                <p>Entrez les informations requises pour commencer l'analyse</p>
+            </div>
+            
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-building"></i>
+                    <input type="text" id="company-name" placeholder="Nom de l'entreprise (Ex: Google, Société Générale, Total...)">
+                </div>
+                
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="user-email" placeholder="Email pour recevoir le rapport">
+                </div>
+                
+                <button class="generate-btn" id="generate-btn">
+                    <i class="fas fa-search"></i> Analyser et envoyer le rapport
+                </button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyse en cours... Veuillez patienter</p>
+            </div>
+            
+            <div class="status-message" id="verification">
+                <i class="fas fa-check-circle"></i>
+                <p>Vérification de l'entreprise en cours...</p>
+            </div>
+            
+            <div class="status-message" id="company-verified">
+                <i class="fas fa-check-double"></i>
+                <p>Entreprise vérifiée. Génération du rapport...</p>
+            </div>
+            
+            <div class="error" id="error">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3 id="error-title">Erreur de traitement</h3>
+                <p id="error-message">Une erreur s'est produite lors du traitement de votre demande.</p>
+            </div>
+            
+            <div class="result" id="result">
+                <i class="fas fa-check-circle"></i>
+                <h3>Rapport envoyé avec succès !</h3>
+                <p>Votre rapport d'analyse pour "<span id="result-company">Nom de l'entreprise</span>" a été envoyé à <span id="result-email">votre adresse email</span>.</p>
+                <p>Veuillez vérifier votre boîte de réception.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══ Reconnaissance Active — KOHOUNKO — IFRI/UAC 2024-2025 ══ -->
+    <div class="container">
+        <section id="section-active">
+            <div class="generator-header">
+                <h3><i class="fas fa-crosshairs" style="color:#1a5276;margin-right:8px;"></i>Reconnaissance Active <span class="badge-active">MODULE IA</span></h3>
+                <p>Validation empirique des services exposés — orchestration par agents IA avec gouvernance et traçabilité</p>
+            </div>
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-network-wired"></i>
+                    <input type="text" id="act-target" placeholder="Cible : IP ou domaine autorisé (ex: 172.21.0.10)">
+                </div>
+                <div class="auth-box" id="act-auth"></div>
+                <button class="active-btn" id="btn-check" onclick="activeCheck()"><i class="fas fa-shield-alt"></i> Vérifier l'autorisation</button>
+                <button class="active-btn" id="btn-scan"  onclick="activeScan()" disabled><i class="fas fa-search-location"></i> Lancer le scan actif</button>
+            </div>
+            <div class="loading" id="act-loading">
+                <div class="spinner"></div>
+                <p id="act-loading-msg">Veuillez patienter...</p>
+            </div>
+            <div class="scan-box" id="act-results">
+                <div class="scan-head">
+                    <span><i class="fas fa-chart-bar" style="margin-right:8px;"></i>Résultats — <span id="res-target"></span></span>
+                    <span class="risk-pill" id="res-risk"></span>
+                </div>
+                <div class="scan-body">
+                    <div class="res-block"><h5><i class="fas fa-plug" style="margin-right:5px;"></i>Ports ouverts (Masscan)</h5><div class="tags" id="res-ports"></div></div>
+                    <div class="res-block"><h5><i class="fas fa-server" style="margin-right:5px;"></i>Services identifiés (Nmap)</h5><div class="tags" id="res-services"></div></div>
+                    <div class="res-block"><h5><i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>Constats</h5><div id="res-findings"></div></div>
+                    <div class="res-block"><h5><i class="fas fa-lightbulb" style="margin-right:5px;"></i>Recommandations</h5><div id="res-recos"></div></div>
+                    <div class="audit-info" id="res-audit"></div>
+                </div>
+            </div>
+            <div class="error" id="act-error">
+                <i class="fas fa-ban"></i>
+                <h3 id="act-error-title">Accès refusé</h3>
+                <p id="act-error-msg"></p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Features -->
+    <div class="container">
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-globe"></i>
+                <h4>Analyse complète</h4>
+                <p>Détection des domaines, sous-domaines et services exposés avec données techniques</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-server"></i>
+                <h4>Infrastructure</h4>
+                <p>Identification des serveurs, technologies utilisées et configuration réseau</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Évaluation sécurité</h4>
+                <p>Détection des vulnérabilités potentielles et recommandations de sécurisation</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>OSINT Report Pro</h4>
+                    <p>L'outil ultime pour l'analyse de reconnaissance passive d'entreprise. Générez des rapports détaillés en quelques clics.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Liens utiles</h4>
+                    <a href="#">Accueil</a>
+                    <a href="#">À propos</a>
+                    <a href="#">Fonctionnalités</a>
+                    <a href="#">Tarifs</a>
+                    <a href="#">Contact</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Légal</h4>
+                    <a href="#">Conditions d'utilisation</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Responsabilité</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Paris, France</p>
+                    <p><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccafa3a2b8adafb88ca3bfa5a2b8bea9bca3beb8e2aabe">[email&#160;protected]</a></p>
+                    <p><i class="fas fa-phone"></i> +33 1 23 45 67 89</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 OSINT Report Pro. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate-btn');
+            const companyInput = document.getElementById('company-name');
+            const emailInput = document.getElementById('user-email');
+            const loading = document.getElementById('loading');
+            const verification = document.getElementById('verification');
+            const companyVerified = document.getElementById('company-verified');
+            const errorSection = document.getElementById('error');
+            const errorTitle = document.getElementById('error-title');
+            const errorMessage = document.getElementById('error-message');
+            const result = document.getElementById('result');
+            const resultCompany = document.getElementById('result-company');
+            const resultEmail = document.getElementById('result-email');
+            
+            // Notification elements
+            const notification = document.getElementById('notification');
+            const notificationIcon = document.getElementById('notification-icon');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            const notificationClose = document.getElementById('notification-close');
+            
+            // URL de votre webhook n8n - À MODIFIER
+            const n8nWebhookUrl = "http://localhost:5678/webhook-test/6ea00867-852f-45b3-a97e-33175bf29293";
+            
+            // Fonction pour afficher les notifications
+            function showNotification(type, title, message) {
+                // Définir les styles en fonction du type
+                notification.className = "notification";
+                notification.classList.add(type);
+                notification.classList.add("show");
+                
+                // Définir l'icône et le texte
+                if (type === "success") {
+                    notificationIcon.className = "notification-icon fas fa-check-circle";
+                } else {
+                    notificationIcon.className = "notification-icon fas fa-exclamation-circle";
+                }
+                
+                notificationTitle.textContent = title;
+                notificationMessage.textContent = message;
+                
+                // Fermer automatiquement après 5 secondes
+                setTimeout(() => {
+                    notification.classList.remove("show");
+                }, 5000);
+            }
+            
+            // Fermer la notification
+            notificationClose.addEventListener('click', function() {
+                notification.classList.remove("show");
+            });
+            
+            // Réinitialiser l'état de l'interface
+            function resetUI() {
+                loading.style.display = 'none';
+                verification.style.display = 'none';
+                companyVerified.style.display = 'none';
+                errorSection.style.display = 'none';
+                result.style.display = 'none';
+            }
+            
+            // Envoi des données à n8n
+            generateBtn.addEventListener('click', async function() {
+                const companyName = companyInput.value.trim();
+                const userEmail = emailInput.value.trim();
+                
+                if (companyName === '') {
+                    showNotification("error", "Erreur", "Veuillez entrer un nom d'entreprise");
+                    companyInput.focus();
+                    return;
+                }
+                
+                if (userEmail === '' || !isValidEmail(userEmail)) {
+                    showNotification("error", "Erreur", "Veuillez entrer une adresse email valide");
+                    emailInput.focus();
+                    return;
+                }
+                
+                // Réinitialiser l'UI
+                resetUI();
+                
+                // Désactiver le bouton
+                generateBtn.disabled = true;
+                
+                // Afficher le chargement
+                loading.style.display = 'block';
+                verification.style.display = 'block';
+                
+                try {
+                    // Envoi des données à n8n
+                    const response = await fetch(n8nWebhookUrl, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            company: companyName,
+                            email: userEmail,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+                    }
+                    
+                    // Simulation du processus
+                    verification.style.display = 'none';
+                    companyVerified.style.display = 'block';
+                    
+                    // Simuler un temps de traitement
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        companyVerified.style.display = 'none';
+                        
+                        // Afficher le résultat
+                        resultCompany.textContent = companyName;
+                        resultEmail.textContent = userEmail;
+                        result.style.display = 'block';
+                        
+                        // Réactiver le bouton
+                        generateBtn.disabled = false;
+                        
+                        // Afficher une notification de succès
+                        showNotification("success", "Succès", `Votre rapport a été envoyé à ${userEmail}`);
+                        
+                    }, 3000);
+                    
+                } catch (error) {
+                    // En cas d'erreur
+                    resetUI();
+                    errorSection.style.display = 'block';
+                    errorTitle.textContent = "Erreur de traitement";
+                    errorMessage.textContent = `Une erreur s'est produite lors du traitement de votre demande: ${error.message}`;
+                    
+                    // Réactiver le bouton
+                    generateBtn.disabled = false;
+                    
+                    // Afficher une notification d'erreur
+                    showNotification("error", "Erreur d'envoi", `Problème de connexion à n8n: ${error.message}`);
+                    
+                    console.error('Erreur détaillée:', error);
+                }
+            });
+            
+            // Fonction de validation d'email
+            function isValidEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\
+                return re.test(String(email).toLowerCase());
+            }
+        });
+    </script>
+
+    <script>
+    /* Reconnaissance Active — KOHOUNKO 2024-2025 */
+    var _API = '/api';
+    function _hide(id){document.getElementById(id).style.display='none';}
+    function _show(id,d){document.getElementById(id).style.display=d||'block';}
+    function _el(id){return document.getElementById(id);}
+
+    async function activeCheck(){
+        var target=_el('act-target').value.trim();
+        if(!target){alert('Veuillez saisir une cible.');return;}
+        _hide('act-results');_hide('act-error');
+        _el('act-auth').style.display='none';
+        _el('act-loading-msg').textContent='Vérification du périmètre autorisé…';
+        _show('act-loading');
+        try{
+            var r=await fetch(_API+'/active/authorize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:target})});
+            var d=await r.json();
+            _hide('act-loading');
+            var a=_el('act-auth');
+            if(d.authorized){a.className='auth-box auth-ok';a.innerHTML='<i class="fas fa-check-circle"></i> Cible autorisée — '+d.reason;_el('btn-scan').disabled=false;}
+            else{a.className='auth-box auth-ko';a.innerHTML='<i class="fas fa-ban"></i> '+d.reason;_el('btn-scan').disabled=true;}
+            a.style.display='block';
+        }catch(e){
+            _hide('act-loading');
+            var a2=_el('act-auth');a2.className='auth-box auth-ko';
+            a2.innerHTML='<i class="fas fa-exclamation-circle"></i> Erreur : '+e.message;a2.style.display='block';
+        }
+    }
+
+    async function activeScan(){
+        var target=_el('act-target').value.trim();
+        _hide('act-results');_hide('act-error');
+        _el('act-loading-msg').textContent='Orchestration des agents IA (Masscan → Nmap → Analyse)…';
+        _show('act-loading');_el('btn-scan').disabled=true;
+        try{
+            var r=await fetch(_API+'/active/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:target,passive_context:{}})});
+            var data=await r.json();
+            _hide('act-loading');_el('btn-scan').disabled=false;
+            if(!data.authorized||data.error){_el('act-error-title').textContent='Scan refusé';_el('act-error-msg').textContent=data.error||'Cible non autorisée.';_show('act-error');return;}
+            var an=data.analysis||{},ms=(data.masscan&&data.masscan.data)?data.masscan.data:{},nm=(data.nmap&&data.nmap.data)?data.nmap.data:{};
+            _el('res-target').textContent=target;
+            var rp=_el('res-risk');rp.textContent=(an.risk_level||'?')+' — '+(an.risk_score||0)+'/100';rp.className='risk-pill risk-'+(an.risk_level||'FAIBLE');
+            var pe=_el('res-ports');pe.innerHTML='';
+            (ms.open_ports||[]).forEach(function(p){var t=document.createElement('span');t.className='tag';t.textContent=p.port+'/'+p.proto;pe.appendChild(t);});
+            if(!(ms.open_ports||[]).length)pe.innerHTML='<span style="color:#95a5a6;font-size:13px;">Aucun port détecté</span>';
+            var se=_el('res-services');se.innerHTML='';
+            (nm.services||[]).forEach(function(s){var t=document.createElement('span');t.className=s.version?'tag warn':'tag';t.textContent=s.port+' '+s.service+(s.version?' '+s.version:'');se.appendChild(t);});
+            if(!(nm.services||[]).length)se.innerHTML='<span style="color:#95a5a6;font-size:13px;">Aucun service identifié</span>';
+            var fe=_el('res-findings');fe.innerHTML='';
+            (an.findings||['Aucun constat']).forEach(function(f){fe.innerHTML+='<div class="row-item"><i class="fas fa-dot-circle" style="color:#e74c3c;flex-shrink:0;margin-top:2px;"></i><span>'+f+'</span></div>';});
+            var re=_el('res-recos');re.innerHTML='';
+            (an.recommendations||['Aucune recommandation']).forEach(function(r){re.innerHTML+='<div class="row-item"><i class="fas fa-arrow-right" style="color:#1a5276;flex-shrink:0;margin-top:2px;"></i><span>'+r+'</span></div>';});
+            _el('res-audit').textContent=(data.audit_trail||[]).length+" entrée(s) dans le journal d'audit";
+            _show('act-results');_el('act-results').scrollIntoView({behavior:'smooth'});
+        }catch(e){
+            _hide('act-loading');_el('btn-scan').disabled=false;
+            _el('act-error-title').textContent='Erreur de connexion';_el('act-error-msg').textContent=e.message;_show('act-error');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded',function(){
+        var n=document.getElementById('nav-active');
+        if(n)n.addEventListener('click',function(e){e.preventDefault();document.getElementById('section-active').scrollIntoView({behavior:'smooth'});});
+    });
+    </script>
+
+</body>
+</html>

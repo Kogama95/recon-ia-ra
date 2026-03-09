@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environnement Dockerisé</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid #334155;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .service-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+        .service-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        .service-card p {
+            margin-bottom: 1.5rem;
+            color: #cbd5e1;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #334155;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Environnement Dockerisé</h1>
+            <p class="subtitle">Tous vos services conteneurisés accessibles depuis une seule plateforme</p>
+        </header>
+
+        <main>
+            <div class="services-grid">
+                                <div class="service-card">
+                    <h2>Reconnaissance Active</h2>
+                    <p>Scan actif gouverné par agents IA — validation des services, scoring de risque et traçabilité</p>
+                    <a href="/#section-active" class="btn">Lancer un scan</a>
+                </div>
+                
+                <div class="service-card">
+                    <h2>Page d'Accueil</h2>
+                    <p>La page principale de votre environnement dockerisé</p>
+                    <a href="/" class="btn">Accéder</a>
+                </div>
+                
+                <div class="service-card">
+                    <h2>API FastAPI</h2>
+                    <p>Documentation interactive de l'API avec Swagger UI</p>
+                    <a href="/docs" class="btn">Documentation API</a>
+                </div>
+                
+                <div class="service-card">
+                    <h2>n8n Automation</h2>
+                    <p>Plateforme d'automatisation de workflows</p>
+                    <a href="/n8n/" class="btn">Accéder à n8n</a>
+                </div>
+                
+                <div class="service-card">
+                    <h2>Ollama LLM</h2>
+                    <p>Service de modèles de langage local</p>
+                    <a href="/ollama/" class="btn">Accéder à Ollama</a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Environnement démarré avec Docker Compose | Tous services fonctionnels</p>
+        </footer>
+    </div>
+</body>
+</html>

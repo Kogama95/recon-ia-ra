@@ -1,0 +1,67 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - web
+      - api
+      - ollama
+    restart: unless-stopped
+
+  web:
+    image: nginx:alpine
+    container_name: web
+    volumes:
+      - ./web:/usr/share/nginx/html
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api
+    expose:
+      - 8000
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_DEBUG=0
+      - AUDIT_DB_PATH=/app/data/audit.sqlite
+      - SCOPE_FILE=/app/config/scope.json
+      - MASSCAN_MAX_RATE=50
+    volumes:
+      - ./api:/app
+      - ./config:/app/config
+      - api_data:/app/data
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    volumes:
+      - ./ollama:/root/.ollama
+    expose:
+      - 11434
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    environment:
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_SECURE_COOKIE=false
+      - NODE_ENV=production
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+      - N8N_TRUST_PROXY=true
+    ports:
+      - "5678:5678"
+    restart: unless-stopped
+
+volumes:
+  api_data:
